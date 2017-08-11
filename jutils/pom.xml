@@ -10,6 +10,7 @@
 	<properties>
 		<maven.iutest.skip>false</maven.iutest.skip>
 		<maven.javadoc.skip>false</maven.javadoc.skip>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
 	<build>
