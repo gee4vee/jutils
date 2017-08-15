@@ -337,7 +337,7 @@ public class AppForker {
 			if (bufferData) {
 				buffer = new StringBuilder(1024);
 			}
-			File file = new File("MultiJVMRunner_" + this.name + ".log");
+			File file = new File("AppForker_" + this.name + ".log");
 			if (!file.exists()) {
 				try {
 					file.createNewFile();
@@ -585,9 +585,9 @@ public class AppForker {
 				+ ARG_SETUP_PROG_ARGS + "[optional setup program to run before running the programs specified in progArgs. Heap spec can follow args after a |] \n"
 
 				+ "\nExample: Run the same program in two JVMs...\n"
-				+ className + " progArgs=\"com.ibm.ilg.util.SimpleTestProgram 10000|com.ibm.ilg.util.SimpleTestProgram 10000\" heapSpecs=\"0,256|128,256\""
+				+ className + " progArgs=\"com.valencia.test.SimpleTestProgram 10000|com.valencia.test.SimpleTestProgram 10000\" heapSpecs=\"0,256|128,256\""
 				+ "\n\nExample: Run a JUnit...\n"
-				+ className + " junitClasses=\"com.ibm.ilg.api.store.EntityDefinitionMgrTest\" heapSpecs=\"0,256\"";
+				+ className + " junitClasses=\"com.valencia.MyTest\" heapSpecs=\"0,256\"";
 	}
 
 }
