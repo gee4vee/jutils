@@ -48,9 +48,9 @@ public class CompressionUtils {
 	public static class CompressedData implements Serializable {
 		private static final long serialVersionUID = 1L;
 		
-		final byte[] data;
-		final int compressedLength;
-		final int originalLength;
+		public final byte[] data;
+		public final int compressedLength;
+		public final int originalLength;
 		
 		public CompressedData(byte[] data, int compressedLength, int originalLength) {
 			this.data = data;
