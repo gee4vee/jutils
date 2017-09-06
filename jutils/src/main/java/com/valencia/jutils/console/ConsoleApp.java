@@ -294,6 +294,14 @@ public class ConsoleApp {
         if (!input.keySet().containsAll(requiredArgNames)) {
             throw new Exception("At least one required argument was not specified. Required args: " + requiredArgNames);
         }
+        
+        for (ConsoleArg arg : this.args) {
+            String argName = arg.getName();
+            if (input.containsKey(argName)) {
+                String value = input.get(argName);
+                arg.setValue(value);
+            }
+        }
     }
     
     public <I, O> void startInteraction(Function<String, String> callback) throws Exception {
