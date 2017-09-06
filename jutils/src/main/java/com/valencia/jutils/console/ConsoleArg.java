@@ -18,6 +18,11 @@ public class ConsoleArg {
         STRING,
         NUMBER,
         BOOLEAN,
+        
+        /**
+         * Used for arguments that don't take in any value, e.g. togglers.
+         */
+        NONE,
         ;
     }
     
@@ -105,6 +110,10 @@ public class ConsoleArg {
     }
 
     public boolean validateInput(Object input, String mvDelim) {
+        if (input == null && this.isRequired) {
+            return false;
+        }
+        
         boolean result;
         if (this.multivalued) {
             if (input instanceof List<?>) {
