@@ -97,6 +97,34 @@ public class ConsoleApp {
         return this;
     }
     
+    public ConsoleApp addArg(String name, InputType inputType, String description) {
+        ConsoleArg arg = new ConsoleArg(name, inputType);
+        arg.setDescription(description);
+        this.args.add(arg);
+        return this;
+    }
+    
+    public ConsoleApp addArg(String name, InputType inputType, String description, boolean isRequired) {
+        ConsoleArg arg = new ConsoleArg(name, inputType, isRequired);
+        arg.setDescription(description);
+        this.args.add(arg);
+        return this;
+    }
+    
+    public ConsoleApp addArg(String name, InputType inputType, String description, boolean isMultivalued, boolean isInteractive) {
+        ConsoleArg arg = new ConsoleArg(name, inputType, isMultivalued, isInteractive);
+        arg.setDescription(description);
+        this.args.add(arg);
+        return this;
+    }
+    
+    public ConsoleApp addArg(String name, InputType inputType, String description, boolean isRequired, boolean isMultivalued, boolean isInteractive) {
+        ConsoleArg arg = new ConsoleArg(name, inputType, isMultivalued, isInteractive, isRequired);
+        arg.setDescription(description);
+        this.args.add(arg);
+        return this;
+    }
+    
     public List<ConsoleArg> getRequiredArgs() {
         List<ConsoleArg> req = new ArrayList<>();
         for (ConsoleArg arg : this.args) {
