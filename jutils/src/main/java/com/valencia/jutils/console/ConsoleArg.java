@@ -34,6 +34,7 @@ public class ConsoleArg {
     private final boolean isRequired;
     private String multiValuedDelimiter = DEFAULT_MV_DELIM;
     private Object value;
+    private boolean valueSet = false;
 
     /**
      * 
@@ -106,6 +107,13 @@ public class ConsoleArg {
 
     public ConsoleArg setValue(Object value) {
         this.value = value;
+        this.valueSet = true;
+        return this;
+    }
+    
+    public ConsoleArg clearValue() {
+        this.value = null;
+        this.valueSet = false;
         return this;
     }
 

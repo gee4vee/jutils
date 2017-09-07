@@ -304,6 +304,12 @@ public class ConsoleApp {
         }
     }
     
+    public void clearArgValues() {
+        for (ConsoleArg arg : this.args) {
+            arg.clearValue();
+        }
+    }
+    
     public <I, O> void startInteraction(Function<String, String> callback) throws Exception {
         System.out.println("Welcome to " + this.getName());
         String input = "";
