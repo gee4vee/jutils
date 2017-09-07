@@ -116,6 +116,10 @@ public class ConsoleArg {
         this.valueSet = false;
         return this;
     }
+    
+    public boolean isValueSet() {
+        return this.valueSet;
+    }
 
     public boolean validateInput(Object input, String mvDelim) {
         if (input == null && this.isRequired) {
