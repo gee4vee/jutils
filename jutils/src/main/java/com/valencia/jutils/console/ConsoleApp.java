@@ -304,6 +304,19 @@ public class ConsoleApp {
         }
     }
     
+    public Object getArgValue(String argName) {
+        return this.getArgValue(argName, null);
+    }
+    
+    public Object getArgValue(String argName, String defaultValue) {
+        ConsoleArg arg = this.getArg(argName);
+        if (arg != null) {
+           return arg.getValue(); 
+        }
+        
+        return defaultValue;
+    }
+    
     public void clearArgValues() {
         for (ConsoleArg arg : this.args) {
             arg.clearValue();
