@@ -101,22 +101,45 @@ public class ConsoleArg {
         return this;
     }
 
+    /**
+     * Returns the value that has been set on this argument. A call should be made to {@link #isValueSet()} prior to calling this 
+     * method to ensure that a value was actually set.
+     * 
+     * @return the value that has been set on this argument
+     */
     public Object getValue() {
         return value;
     }
 
+    /**
+     * Sets the value of this argument.
+     * 
+     * @param value The value to set.
+     * 
+     * @return this argument
+     */
     public ConsoleArg setValue(Object value) {
         this.value = value;
         this.valueSet = true;
         return this;
     }
     
+    /**
+     * Sets the value of this argument to <code>null</code> and resets this argument to indicate that a value has not been set.
+     * 
+     * @return this argument
+     */
     public ConsoleArg clearValue() {
         this.value = null;
         this.valueSet = false;
         return this;
     }
     
+    /**
+     * Returns whether a value has been set for this argument.
+     * 
+     * @return <code>true</code> if a value has been previously set using {@link #setValue(Object)}; <code>false</code> otherwise.
+     */
     public boolean isValueSet() {
         return this.valueSet;
     }

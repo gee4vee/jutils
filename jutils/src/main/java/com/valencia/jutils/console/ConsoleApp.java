@@ -229,6 +229,15 @@ public class ConsoleApp {
         this.printUsage(System.out);
     }
     
+    /**
+     * Validates the specified input arguments against the arguments specified in this app. If any input is invalid, an exception 
+     * will be thrown. If all inputs are valid, the input values will be set on the corresponding <code>ConsoleArg</code>. The 
+     * input values can then be retrieved with one of the <code>getArg*Value</code> methods.
+     * 
+     * @param args The input argument values.
+     * 
+     * @throws Exception If any of the input values is invalid.
+     */
     public void validateArgs(String... args) throws Exception {
         Map<String, String> input = new HashMap<>();
         if (this.argType.equals(ArgType.KEY_VALUE_PAIR)) {
@@ -304,19 +313,143 @@ public class ConsoleApp {
         }
     }
     
+    /**
+     * Returns the value that was set for the argument with the specified name, or <code>null</code> if the value has not been set or 
+     * an argument with the specified name cannot be found.
+     *  
+     * @param argName The name of the argument.
+     * 
+     * @return the value that was set for the argument with the specified name, or <code>null</code> if the value has not been set or 
+     * an argument with the specified name cannot be found.
+     */
     public Object getArgValue(String argName) {
         return this.getArgValue(argName, null);
     }
     
     public Object getArgValue(String argName, String defaultValue) {
         ConsoleArg arg = this.getArg(argName);
-        if (arg != null) {
+        if (arg != null && arg.isValueSet()) {
            return arg.getValue(); 
         }
         
         return defaultValue;
     }
     
+    /**
+     * Returns the value that was set for the argument with the specified name as an <code>Integer</code>.
+     * 
+     * @param argName The name of the argument.
+     * @param defaultValue A default value to return if the specified argument does not have a value set.
+     * 
+     * @return the value that was set for the argument with the specified name, or <code>null</code> if the value has not been set or 
+     * an argument with the specified name cannot be found.
+     * 
+     * @throws IllegalArgumentException If the value for the specified argument cannot be retrieved as an <code>Integer</code>.
+     */
+    public Integer getArgIntValue(String argName, Integer defaultValue) throws IllegalArgumentException {
+        Object value = this.getArgValue(argName);
+        if (value == null) {
+            return defaultValue;
+        }
+        
+        if (value instanceof Integer) {
+            return ((Integer)value);
+        }
+        
+        if (value instanceof String) {
+            return Integer.parseInt(value.toString());
+        }
+        
+        throw new IllegalArgumentException("Cannot get integer value for argument " + argName);
+    }
+    
+    /**
+     * Returns the value that was set for the argument with the specified name as a <code>Long</code>.
+     * 
+     * @param argName The name of the argument.
+     * @param defaultValue A default value to return if the specified argument does not have a value set.
+     * 
+     * @return the value that was set for the argument with the specified name, or <code>null</code> if the value has not been set or 
+     * an argument with the specified name cannot be found.
+     * 
+     * @throws IllegalArgumentException If the value for the specified argument cannot be retrieved as a <code>Long</code>.
+     */
+    public Long getArgLongValue(String argName, Long defaultValue) throws IllegalArgumentException {
+        Object value = this.getArgValue(argName);
+        if (value == null) {
+            return defaultValue;
+        }
+        
+        if (value instanceof Long || value instanceof Integer) {
+            return ((Long)value);
+        }
+        
+        if (value instanceof String) {
+            return Long.parseLong(value.toString());
+        }
+        
+        throw new IllegalArgumentException("Cannot get long value for argument " + argName);
+    }
+    
+    /**
+     * Returns the value that was set for the argument with the specified name as a <code>Double</code>.
+     * 
+     * @param argName The name of the argument.
+     * @param defaultValue A default value to return if the specified argument does not have a value set.
+     * 
+     * @return the value that was set for the argument with the specified name, or <code>null</code> if the value has not been set or 
+     * an argument with the specified name cannot be found.
+     * 
+     * @throws IllegalArgumentException If the value for the specified argument cannot be retrieved as a <code>Double</code>.
+     */
+    public Double getArgDoubleValue(String argName, Double defaultValue) throws IllegalArgumentException {
+        Object value = this.getArgValue(argName);
+        if (value == null) {
+            return defaultValue;
+        }
+        
+        if (value instanceof Double) {
+            return ((Double)value);
+        }
+        
+        if (value instanceof String) {
+            return Double.parseDouble(value.toString());
+        }
+        
+        throw new IllegalArgumentException("Cannot get double value for argument " + argName);
+    }
+    
+    /**
+     * Returns the value that was set for the argument with the specified name as a <code>Boolean</code>.
+     * 
+     * @param argName The name of the argument.
+     * @param defaultValue A default value to return if the specified argument does not have a value set.
+     * 
+     * @return the value that was set for the argument with the specified name, or <code>null</code> if the value has not been set or 
+     * an argument with the specified name cannot be found.
+     * 
+     * @throws IllegalArgumentException If the value for the specified argument cannot be retrieved as a <code>Boolean</code>.
+     */
+    public Boolean getArgBooleanValue(String argName, Boolean defaultValue) throws IllegalArgumentException {
+        Object value = this.getArgValue(argName);
+        if (value == null) {
+            return defaultValue;
+        }
+        
+        if (value instanceof Boolean) {
+            return ((Boolean)value);
+        }
+        
+        if (value instanceof String) {
+            return Boolean.parseBoolean(value.toString());
+        }
+        
+        throw new IllegalArgumentException("Cannot get boolean value for argument " + argName);
+    }
+    
+    /**
+     * Clears the value that was set for all arguments in this app.
+     */
     public void clearArgValues() {
         for (ConsoleArg arg : this.args) {
             arg.clearValue();
@@ -334,14 +467,9 @@ public class ConsoleApp {
                 throw new Exception("An error occurred while getting input", e);
             }
             
-            if (!INPUT_EXIT.equalsIgnoreCase(input)) {
+            if (INPUT_EXIT.equalsIgnoreCase(input)) {
                 System.out.println("Exiting...");
                 break;
-            }
-            
-            if (this.argType.equals(ArgType.KEY_VALUE_PAIR) && !input.contains(EQUAL)) {
-                System.out.println("\tInput is expected in key-value pair form, e.g. ArgName=ArgValue.");
-                continue;
             }
             
             String argName;
@@ -353,24 +481,30 @@ public class ConsoleApp {
             }
             ConsoleArg arg = this.getArg(argName);
             if (arg == null) {
-                System.out.println("\tUnexpected argument " + argName);
+                System.out.println("\tUnexpected input " + argName);
+                continue;
+            }
+            
+            if (!InputType.NONE.equals(arg.getInputType()) && this.argType.equals(ArgType.KEY_VALUE_PAIR) && !input.contains(EQUAL)) {
+                System.out.println("\tInput is expected in key-value pair form, e.g. ArgName=ArgValue.");
                 continue;
             }
             
             String output = callback.apply(input);
             System.out.println(">> Output: " + output);
+            System.out.println();
         }
     }
     
     private String getInput() throws IOException {
-        System.out.println(">> ");
+        System.out.print(">> ");
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         String input = reader.readLine();
         return input;
     }
 
     private void printAvailableInteractiveOptions() {
-        System.out.println("Please enter one of the available options:");
+        System.out.println("Please enter one of the following available options or " + INPUT_EXIT + " to exit immediately:");
         List<ConsoleArg> interactiveArgs = this.getInteractiveArgs();
         for (ConsoleArg arg : interactiveArgs) {
             StringBuilder sb = new StringBuilder();
@@ -382,7 +516,13 @@ public class ConsoleApp {
                 } else {
                     sb.append(SINGLE_SPACE);
                 }
+                sb.append(arg.getInputType());
+                if (arg.isMultivalued()) {
+                    String mvDelim = arg.getMultiValuedDelimiter();
+                    sb.append(mvDelim).append(inputType).append(mvDelim).append("...");
+                }
             }
+            sb.append(" - ").append(arg.getDescription());
             System.out.println(sb.toString());
         }
     }
