@@ -244,6 +244,11 @@ public class ConsoleApp {
         Map<String, String> input = new HashMap<>();
         if (this.argType.equals(ArgType.KEY_VALUE_PAIR)) {
             for (String arg : args) {
+            	if (INPUT_HELP.equalsIgnoreCase(arg)) {
+            		System.out.println(getUsage());
+            		continue;
+            	}
+            	
                 if (!arg.contains(EQUAL)) {
                     throw new Exception("Argument '" + arg + "' must be in key-value form.");
                 }
@@ -275,6 +280,11 @@ public class ConsoleApp {
         } else {
             for (int i = 0; i < args.length; i+=2) {
                 String argName = args[i];
+            	if (INPUT_HELP.equalsIgnoreCase(argName)) {
+            		System.out.println(getUsage());
+            		continue;
+            	}
+            	
                 if (!this.expectsArg(argName)) {
                     throw new Exception("Unexpected argument: " + argName);
                 }
