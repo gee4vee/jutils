@@ -554,7 +554,7 @@ public class ConsoleApp {
             if (INPUT_EXIT.equalsIgnoreCase(input)) {
                 if (exitHandler != null) {
                     System.out.println("Exiting...");
-                    System.out.println("Output: " + exitHandler.apply(input));
+                    System.out.println(exitHandler.apply(input));
                 }
                 System.out.println("Goodbye!");
                 break;
@@ -607,7 +607,7 @@ public class ConsoleApp {
                 System.out.println("No input handler for " + input);
             } else {
                 String output = callback.apply(input);
-                System.out.println("Output: " + output);
+                System.out.println("Result: " + output);
             }
             System.out.println();
         }
