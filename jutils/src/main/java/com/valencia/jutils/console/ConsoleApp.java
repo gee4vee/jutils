@@ -326,6 +326,19 @@ public class ConsoleApp {
     }
     
     /**
+     * Sets the value of the argument with the specified name if it exists.
+     * 
+     * @param argName The name of the argument.
+     * @param value The value to set.
+     */
+    public void setArgValue(String argName, Object value) {
+    	ConsoleArg arg = this.getArg(argName);
+    	if (arg != null) {
+    		arg.setValue(value);
+    	}
+    }
+    
+    /**
      * Returns the value that was set for the argument with the specified name, or <code>null</code> if the value has not been set or 
      * an argument with the specified name cannot be found.
      *  
@@ -514,9 +527,12 @@ public class ConsoleApp {
             }
             
             String argName;
-            if (input.contains(EQUAL)) {
-                String[] split = input.split(EQUAL);
+            String[] valueSplit = input.split(EQUAL);
+			if (input.contains(EQUAL)) {
+                String[] split = valueSplit;
                 argName = split[0];
+                String value = split[1];
+                this.setArgValue(argName, value);
             } else {
                 argName = input;
             }
@@ -540,13 +556,7 @@ public class ConsoleApp {
             if (inputHandlers.containsKey(KEY_INTERACTION_CALLBACKS_ALL)) {
             	callback = inputHandlers.get(KEY_INTERACTION_CALLBACKS_ALL);
             } else {
-            	String key;
-            	if (input.contains(EQUAL)) {
-            		key = input.split(EQUAL)[0];
-            	} else {
-            		key = input;
-            	}
-            	callback = inputHandlers.get(key);
+            	callback = inputHandlers.get(argName);
             }
             
             if (callback == null) {
