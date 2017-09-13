@@ -52,7 +52,7 @@ public class ConsoleApp {
     private final String name;
     private final String version;
     private final List<ConsoleArg> args = new ArrayList<>();
-    private final ArgType argType;
+    private ArgType argType;
     private String description;
 
     /**
@@ -73,7 +73,7 @@ public class ConsoleApp {
     }
 
     public String getDescription() {
-        return description;
+        return this.description;
     }
 
     public ConsoleApp setDescription(String description) {
@@ -82,11 +82,15 @@ public class ConsoleApp {
     }
 
     public String getVersion() {
-        return version;
+        return this.version;
     }
 
     public ArgType getArgType() {
-        return argType;
+        return this.argType;
+    }
+    
+    public void setArgType(ArgType type) {
+        this.argType = type;
     }
 
     public List<ConsoleArg> getArgs() {
