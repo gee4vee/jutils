@@ -456,7 +456,23 @@ public class ConsoleApp {
         }
     }
     
-    public <I, O> void startInteraction(Function<String, String> callback) throws Exception {
+    /**
+     * Used in a <code>Map</code> passed to {@link #startInteraction(Map)} to specify an input handler that will be used 
+     * for all possible inputs.
+     */
+    public static final String KEY_INTERACTION_CALLBACKS_ALL = "InteractionCallbacksAll";
+    
+    /**
+     * Starts the interactive console loop.
+     * 
+     * @param inputHandlers A map of input handler functions that will be used to handle the various inputs chosen by the user. 
+     * The key is one of the possible inputs arguments. The value is a function that will take the input and produce a 
+     * String result. Use the key {@link #KEY_INTERACTION_CALLBACKS_ALL} to specify a single input handler function for all 
+     * possible inputs. If this key is used, any other entries in the map are ignored.
+     * 
+     * @throws Exception
+     */
+    public <I, O> void startInteraction(Map<String, Function<String, String>> inputHandlers) throws Exception {
         System.out.println("Welcome to " + this.getName());
         String input = "";
         while (true) {
@@ -490,8 +506,30 @@ public class ConsoleApp {
                 continue;
             }
             
-            String output = callback.apply(input);
-            System.out.println(">> Output: " + output);
+            if (inputHandlers == null) {
+            	System.out.println();
+            	continue;
+            }
+            
+            Function<String, String> callback;
+            if (inputHandlers.containsKey(KEY_INTERACTION_CALLBACKS_ALL)) {
+            	callback = inputHandlers.get(KEY_INTERACTION_CALLBACKS_ALL);
+            } else {
+            	String key;
+            	if (input.contains(EQUAL)) {
+            		key = input.split(EQUAL)[0];
+            	} else {
+            		key = input;
+            	}
+            	callback = inputHandlers.get(key);
+            }
+            
+            if (callback == null) {
+            	System.out.println("No input handler for " + input);
+            } else {
+                String output = callback.apply(input);
+                System.out.println(">> Output: " + output);
+            }
             System.out.println();
         }
     }
