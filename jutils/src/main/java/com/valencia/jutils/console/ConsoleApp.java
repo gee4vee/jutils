@@ -462,6 +462,12 @@ public class ConsoleApp {
      */
     public static final String KEY_INTERACTION_CALLBACKS_ALL = "InteractionCallbacksAll";
     
+    public static Map<String, Function<String, String>> getSingleInputHandlerMap(Function<String, String> handler) {
+    	Map<String, Function<String, String>> map = new HashMap<>();
+    	map.put(KEY_INTERACTION_CALLBACKS_ALL, handler);
+    	return map;
+    }
+    
     /**
      * Starts the interactive console loop.
      * 
