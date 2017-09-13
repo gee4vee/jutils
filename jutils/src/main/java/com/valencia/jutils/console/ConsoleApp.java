@@ -506,7 +506,7 @@ public class ConsoleApp {
         map.put(KEY_INTERACTION_CALLBACKS_ALL, handler);
         return map;
     }
-
+    
     /**
      * Starts the interactive console loop.
      * 
@@ -518,6 +518,22 @@ public class ConsoleApp {
      * @throws Exception
      */
     public <I, O> void startInteraction(Map<String, Function<String, String>> inputHandlers) throws Exception {
+        this.startInteraction(inputHandlers, null);
+    }
+
+    /**
+     * Starts the interactive console loop.
+     * 
+     * @param inputHandlers A map of input handler functions that will be used to handle the various inputs chosen by the user. 
+     * The key is one of the possible inputs arguments. The value is a function that will take the input and produce a 
+     * String result. Use the key {@link #KEY_INTERACTION_CALLBACKS_ALL} to specify a single input handler function for all 
+     * possible inputs. If this key is used, any other entries in the map are ignored.
+     * @param exitHandler The function to invoke when the interaction loop is about to exit. Can be <code>null</code>.
+     * 
+     * @throws Exception
+     */
+    public <I, O> void startInteraction(Map<String, Function<String, String>> inputHandlers, Function<String, String> exitHandler) 
+            throws Exception {
         System.out.println("Welcome to " + this.getName() + " " + this.getVersion());
         String input = "";
         boolean firstTime = true;
@@ -536,6 +552,10 @@ public class ConsoleApp {
             }
 
             if (INPUT_EXIT.equalsIgnoreCase(input)) {
+                if (exitHandler != null) {
+                    System.out.println("Exiting...");
+                    System.out.println("Output: " + exitHandler.apply(input));
+                }
                 System.out.println("Goodbye!");
                 break;
             }
@@ -587,7 +607,7 @@ public class ConsoleApp {
                 System.out.println("No input handler for " + input);
             } else {
                 String output = callback.apply(input);
-                System.out.println(">> Output: " + output);
+                System.out.println("Output: " + output);
             }
             System.out.println();
         }
