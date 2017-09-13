@@ -567,7 +567,7 @@ public class ConsoleApp {
     }
 
     private void printAvailableInteractiveOptions(boolean printAllOptions) {
-        System.out.println("Please enter one of the following available options, " 
+        System.out.println("Please enter one of the available options, " 
         					+ INPUT_HELP + " to display the available options, or " 
     						+ INPUT_EXIT + " to exit immediately:");
         if (printAllOptions) {
