@@ -194,7 +194,12 @@ public class ConsoleApp {
             }
             InputType inputType = arg.getInputType();
             if (!InputType.NONE.equals(inputType)) {
-                sb.append(EQUAL).append(inputType);
+                if (this.argType.equals(ArgType.KEY_VALUE_PAIR)) {
+                    sb.append(EQUAL);
+                } else {
+                    sb.append(SINGLE_SPACE);
+                }
+                sb.append(inputType);
                 if (arg.isMultivalued()) {
                     String mvDelim = arg.getMultiValuedDelimiter();
                     sb.append(mvDelim).append(inputType).append(mvDelim).append("...");
@@ -287,6 +292,12 @@ public class ConsoleApp {
                     System.out.println(getUsage());
                     continue;
                 }
+                
+                if (!argName.startsWith(ARG_PREFIX)) {
+                    throw new Exception("Argument must start with prefix " + ARG_PREFIX);
+                }
+                
+                argName = argName.replace(ARG_PREFIX, "");
 
                 if (!this.expectsArg(argName)) {
                     throw new Exception("Unexpected argument: " + argName);
