@@ -540,20 +540,30 @@ public class ConsoleApp {
                 break;
             }
 
-            String argName;
-            String[] valueSplit = input.split(EQUAL);
-            if (input.contains(EQUAL)) {
-                String[] split = valueSplit;
-                argName = split[0];
-                String value = split[1];
-                this.setArgValue(argName, value);
+            String[] valueSplit;
+            if (ArgType.KEY_VALUE_PAIR.equals(this.argType)) {
+                if (!input.contains(EQUAL)) {
+                    throw new Exception("Input must be in key-value for, e.g. key=value.");
+                }
+                valueSplit = input.split(EQUAL);
             } else {
-                argName = input;
+                valueSplit = input.split(SINGLE_SPACE);
             }
+            String argName = valueSplit[0];
             ConsoleArg arg = this.getArg(argName);
             if (arg == null) {
                 System.out.println("\tUnexpected input " + argName);
                 continue;
+            }
+            
+            if (!InputType.NONE.equals(arg.getInputType())) {
+                if (valueSplit.length < 2) {
+                    String numValuesRequired = arg.isMultivalued() ? "at least one" : "one";
+                    System.out.println("Argument " + argName + " requires " + numValuesRequired + " input values.");
+                    continue;
+                }
+                String value = valueSplit[1];
+                this.setArgValue(argName, value);
             }
 
             if (!InputType.NONE.equals(arg.getInputType()) && this.argType.equals(ArgType.KEY_VALUE_PAIR) && !input.contains(EQUAL)) {
