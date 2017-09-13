@@ -481,7 +481,7 @@ public class ConsoleApp {
      * @throws Exception
      */
     public <I, O> void startInteraction(Map<String, Function<String, String>> inputHandlers) throws Exception {
-        System.out.println("Welcome to " + this.getName());
+        System.out.println("Welcome to " + this.getName() + " " + this.getVersion());
         String input = "";
         boolean firstTime = true;
         while (true) {
@@ -557,8 +557,9 @@ public class ConsoleApp {
     }
 
     private void printAvailableInteractiveOptions(boolean printAllOptions) {
-        System.out.println("Please enter one of the following available options, " + INPUT_HELP 
-        					+ " to display the available commands, or " + INPUT_EXIT + " to exit immediately:");
+        System.out.println("Please enter one of the following available options, " 
+        					+ INPUT_HELP + " to display the available options, or " 
+    						+ INPUT_EXIT + " to exit immediately:");
         if (printAllOptions) {
             List<ConsoleArg> interactiveArgs = this.getInteractiveArgs();
             for (ConsoleArg arg : interactiveArgs) {
