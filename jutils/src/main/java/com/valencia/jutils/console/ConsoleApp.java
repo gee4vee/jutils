@@ -35,6 +35,8 @@ public class ConsoleApp {
     
     public static final String INPUT_EXIT = "exit";
     
+    public static final String INPUT_HELP = "?";
+    
     public static enum ArgType {
         /**
          * Example: --host hostName
@@ -481,12 +483,19 @@ public class ConsoleApp {
     public <I, O> void startInteraction(Map<String, Function<String, String>> inputHandlers) throws Exception {
         System.out.println("Welcome to " + this.getName());
         String input = "";
+        boolean firstTime = true;
         while (true) {
-            this.printAvailableInteractiveOptions();
+            this.printAvailableInteractiveOptions(firstTime);
+            firstTime = false;
             try {
                 input = this.getInput();
             } catch (IOException e) {
                 throw new Exception("An error occurred while getting input", e);
+            }
+            
+            if (INPUT_HELP.equalsIgnoreCase(input)) {
+            	firstTime = true;
+            	continue;
             }
             
             if (INPUT_EXIT.equalsIgnoreCase(input)) {
@@ -547,27 +556,30 @@ public class ConsoleApp {
         return input;
     }
 
-    private void printAvailableInteractiveOptions() {
-        System.out.println("Please enter one of the following available options or " + INPUT_EXIT + " to exit immediately:");
-        List<ConsoleArg> interactiveArgs = this.getInteractiveArgs();
-        for (ConsoleArg arg : interactiveArgs) {
-            StringBuilder sb = new StringBuilder();
-            sb.append("\t").append(arg.getName());
-            InputType inputType = arg.getInputType();
-            if (!InputType.NONE.equals(inputType)) {
-                if (this.argType.equals(ArgType.KEY_VALUE_PAIR)) {
-                    sb.append(EQUAL);
-                } else {
-                    sb.append(SINGLE_SPACE);
+    private void printAvailableInteractiveOptions(boolean printAllOptions) {
+        System.out.println("Please enter one of the following available options, " + INPUT_HELP 
+        					+ "to display the available commands, or " + INPUT_EXIT + " to exit immediately:");
+        if (printAllOptions) {
+            List<ConsoleArg> interactiveArgs = this.getInteractiveArgs();
+            for (ConsoleArg arg : interactiveArgs) {
+                StringBuilder sb = new StringBuilder();
+                sb.append("\t").append(arg.getName());
+                InputType inputType = arg.getInputType();
+                if (!InputType.NONE.equals(inputType)) {
+                    if (this.argType.equals(ArgType.KEY_VALUE_PAIR)) {
+                        sb.append(EQUAL);
+                    } else {
+                        sb.append(SINGLE_SPACE);
+                    }
+                    sb.append(arg.getInputType());
+                    if (arg.isMultivalued()) {
+                        String mvDelim = arg.getMultiValuedDelimiter();
+                        sb.append(mvDelim).append(inputType).append(mvDelim).append("...");
+                    }
                 }
-                sb.append(arg.getInputType());
-                if (arg.isMultivalued()) {
-                    String mvDelim = arg.getMultiValuedDelimiter();
-                    sb.append(mvDelim).append(inputType).append(mvDelim).append("...");
-                }
+                sb.append(" - ").append(arg.getDescription());
+                System.out.println(sb.toString());
             }
-            sb.append(" - ").append(arg.getDescription());
-            System.out.println(sb.toString());
         }
     }
     
