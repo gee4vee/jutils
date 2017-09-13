@@ -499,7 +499,7 @@ public class ConsoleApp {
             }
             
             if (INPUT_EXIT.equalsIgnoreCase(input)) {
-                System.out.println("Exiting...");
+                System.out.println("Goodbye!");
                 break;
             }
             
@@ -558,7 +558,7 @@ public class ConsoleApp {
 
     private void printAvailableInteractiveOptions(boolean printAllOptions) {
         System.out.println("Please enter one of the following available options, " + INPUT_HELP 
-        					+ "to display the available commands, or " + INPUT_EXIT + " to exit immediately:");
+        					+ " to display the available commands, or " + INPUT_EXIT + " to exit immediately:");
         if (printAllOptions) {
             List<ConsoleArg> interactiveArgs = this.getInteractiveArgs();
             for (ConsoleArg arg : interactiveArgs) {
