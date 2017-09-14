@@ -10,7 +10,12 @@ package com.valencia.jutils.jvm;
  */
 public enum Platform {
 	
-	WINDOWS, LINUX, MAC_OS, AIX,
+	WINDOWS, LINUX, MAC_OS, AIX, 
+	
+	/**
+	 * Used to indicate any platform.
+	 */
+	ALL,
 	;
 	
 	public static Platform get() {
