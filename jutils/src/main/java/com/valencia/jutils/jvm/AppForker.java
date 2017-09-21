@@ -5,10 +5,13 @@ package com.valencia.jutils.jvm;
 
 
 import java.io.BufferedInputStream;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -226,6 +229,33 @@ public class AppForker {
 
 		return jvms;
 	}
+	
+	   /**
+     * Sends the specified string to the standard input stream of the specified process. Note that a sleep might be needed after sending a 
+     * command and before sending another one to ensure that the process can receive and process the command. This will vary based on how much 
+     * time the program needs to process the command and wait for new input. 
+     * 
+     * @param proc The process to which to send the string.
+     * @param cmd The string to send to the process.
+     * @param sleepAfterMs The amount of time to sleep after executing the command.
+     * 
+     * @throws IOException
+     */
+    public static void sendCmdToProcess(Process proc, String cmd, long sleepAfterMs) throws IOException {
+        OutputStream outputStream = proc.getOutputStream();
+        OutputStreamWriter osw = new OutputStreamWriter(outputStream);
+        BufferedWriter writer = new BufferedWriter(osw);
+        try {
+            writer.write(cmd);
+            writer.newLine();
+            writer.flush();
+        } finally {
+            try {
+                Thread.sleep(sleepAfterMs);
+            } catch (InterruptedException e) {
+            }
+        }
+    }
 
 	/**
 	 * Closes any resources allocated after a call to {@link #execute()}.
