@@ -5,11 +5,13 @@ package com.valencia.jutils.jvm;
 
 
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
@@ -255,6 +257,31 @@ public class AppForker {
             } catch (InterruptedException e) {
             }
         }
+    }
+    
+    /**
+     * Reads the standard output stream of the specified process.
+     * 
+     * @param proc
+     *            The process to which to send the string.
+     * @param cmd
+     *            The string to send to the process.
+     * @param sleepAfterMs
+     *            The amount of time to sleep after executing the command.
+     * 
+     * @throws IOException
+     */
+    public static String readProcessOutput(Process proc) throws IOException {
+        InputStream inputStream = proc.getInputStream();
+        InputStreamReader isr = new InputStreamReader(inputStream);
+        BufferedReader reader = new BufferedReader(isr);
+        StringBuilder b = new StringBuilder();
+        String line = null;
+        while ((line = reader.readLine()) != null) {
+            b.append(line);
+        }
+        
+        return b.toString();
     }
 
 	/**
