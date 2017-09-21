@@ -45,6 +45,8 @@ public class AppForker {
 	private String[] setupProgramArgs;
 	private HeapSpec setupProgramHeapSpec;
 
+    private File redirectOutputFile;
+
 	public AppForker(List<String[]> programArgs) {
 		this.programArgs.clear();
 		this.programArgs.addAll(programArgs);
@@ -139,6 +141,10 @@ public class AppForker {
 	public void setSetupProgramHeapSpec(HeapSpec setupProgramHeapSpec) {
 		this.setupProgramHeapSpec = setupProgramHeapSpec;
 	}
+	
+	public void redirectOutputToFile(File outputFile) {
+	    this.redirectOutputFile = outputFile;
+	}
 
 	public static final String JUNIT_RUNNER_CLASS_NAME = "org.junit.runner.JUnitCore";
 
@@ -165,6 +171,9 @@ public class AppForker {
 			}
 
 			ProcessBuilder processBuilder = new ProcessBuilder(progArgs);
+			if (this.redirectOutputFile != null) {
+			    processBuilder.redirectOutput(this.redirectOutputFile);
+			}
 			// redirect stderr to stdin so its merged
 			processBuilder.redirectErrorStream(true);
 			procBuilders.add(processBuilder);
