@@ -47,6 +47,8 @@ public class AppForker {
 
     private File redirectOutputFile;
 
+    private boolean readOutputToLogFile = true;
+
 	public AppForker(List<String[]> programArgs) {
 		this.programArgs.clear();
 		this.programArgs.addAll(programArgs);
@@ -145,8 +147,24 @@ public class AppForker {
 	public void redirectOutputToFile(File outputFile) {
 	    this.redirectOutputFile = outputFile;
 	}
+	
+	public File getRedirectOutputFile() {
+        return redirectOutputFile;
+    }
 
-	public static final String JUNIT_RUNNER_CLASS_NAME = "org.junit.runner.JUnitCore";
+    public void setRedirectOutputFile(File redirectOutputFile) {
+        this.redirectOutputFile = redirectOutputFile;
+    }
+
+    public boolean isReadOutputToFile() {
+        return readOutputToLogFile;
+    }
+
+    public void setReadOutputToFile(boolean read) {
+        this.readOutputToLogFile = read;
+    }
+
+    public static final String JUNIT_RUNNER_CLASS_NAME = "org.junit.runner.JUnitCore";
 
 	/**
 	 * <p>Starts the programs specified in {@link #getProgramArgs()} each in its own JVM. If {@link #isWaitForJVMs()} returns 
@@ -209,10 +227,12 @@ public class AppForker {
 			// redirect stderr to stdin so its merged
 			processBuilder.redirectErrorStream(true);
 			Process process = processBuilder.start();
-			// separate thread will print stdout and stderr to console and log file
-			StreamReaderThread ioThread = getStreamReaderThread(procIndex, process);
-			ioThread.start();
-			this.ioThreads.add(ioThread);
+			if (this.redirectOutputFile == null && this.readOutputToLogFile) {
+	            // separate thread will print stdout and stderr to console and log file
+	            StreamReaderThread ioThread = getStreamReaderThread(procIndex, process);
+	            ioThread.start();
+	            this.ioThreads.add(ioThread);
+			}
 			this.waitForJVM(processBuilder, process);
 		}
 
@@ -223,9 +243,12 @@ public class AppForker {
 				logger.info("Starting JVM with args: " + StringUtils.join(builder.command().iterator(), " "));
 			}
 			Process process = builder.start();
-			StreamReaderThread ioThread = getStreamReaderThread(procIndex, process);
-			ioThread.start();
-			this.ioThreads.add(ioThread);
+            if (this.redirectOutputFile == null && this.readOutputToLogFile) {
+                // separate thread will print stdout and stderr to console and log file
+                StreamReaderThread ioThread = getStreamReaderThread(procIndex, process);
+                ioThread.start();
+                this.ioThreads.add(ioThread);
+            }
 			jvms.put(builder, process);
 			procIndex++;
 		}
