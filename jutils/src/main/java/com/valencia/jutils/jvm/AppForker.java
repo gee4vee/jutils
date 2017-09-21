@@ -273,15 +273,18 @@ public class AppForker {
      */
     public static String readProcessOutput(Process proc) throws IOException {
         InputStream inputStream = proc.getInputStream();
-        InputStreamReader isr = new InputStreamReader(inputStream);
-        BufferedReader reader = new BufferedReader(isr);
-        StringBuilder b = new StringBuilder();
-        String line = null;
-        while ((line = reader.readLine()) != null) {
-            b.append(line);
+        try {
+            InputStreamReader isr = new InputStreamReader(inputStream);
+            BufferedReader reader = new BufferedReader(isr);
+            StringBuilder b = new StringBuilder();
+            String line = null;
+            while ((line = reader.readLine()) != null) {
+                b.append(line);
+            }
+            return b.toString();
+        } finally {
+            inputStream.close();
         }
-        
-        return b.toString();
     }
 
 	/**
