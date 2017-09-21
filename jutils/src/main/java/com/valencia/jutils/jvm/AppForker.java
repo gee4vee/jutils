@@ -47,7 +47,7 @@ public class AppForker {
 
     private File redirectOutputFile;
 
-    private boolean readOutputToLogFile = true;
+    private boolean readOutputToConsoleAndLogFile = true;
 
 	public AppForker(List<String[]> programArgs) {
 		this.programArgs.clear();
@@ -156,12 +156,12 @@ public class AppForker {
         this.redirectOutputFile = redirectOutputFile;
     }
 
-    public boolean isReadOutputToFile() {
-        return readOutputToLogFile;
+    public boolean isReadOutputToConsoleAndFile() {
+        return readOutputToConsoleAndLogFile;
     }
 
-    public void setReadOutputToFile(boolean read) {
-        this.readOutputToLogFile = read;
+    public void setReadOutputToConsoleAndFile(boolean read) {
+        this.readOutputToConsoleAndLogFile = read;
     }
 
     public static final String JUNIT_RUNNER_CLASS_NAME = "org.junit.runner.JUnitCore";
@@ -227,7 +227,7 @@ public class AppForker {
 			// redirect stderr to stdin so its merged
 			processBuilder.redirectErrorStream(true);
 			Process process = processBuilder.start();
-			if (this.redirectOutputFile == null && this.readOutputToLogFile) {
+			if (this.redirectOutputFile == null && this.readOutputToConsoleAndLogFile) {
 	            // separate thread will print stdout and stderr to console and log file
 	            StreamReaderThread ioThread = getStreamReaderThread(procIndex, process);
 	            ioThread.start();
@@ -243,7 +243,7 @@ public class AppForker {
 				logger.info("Starting JVM with args: " + StringUtils.join(builder.command().iterator(), " "));
 			}
 			Process process = builder.start();
-            if (this.redirectOutputFile == null && this.readOutputToLogFile) {
+            if (this.redirectOutputFile == null && this.readOutputToConsoleAndLogFile) {
                 // separate thread will print stdout and stderr to console and log file
                 StreamReaderThread ioThread = getStreamReaderThread(procIndex, process);
                 ioThread.start();
