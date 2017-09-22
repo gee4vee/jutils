@@ -185,7 +185,7 @@ public class AppForker {
     public void clearOutputBuffer(int procIndex) {
         StreamReaderThread readerThread = this.ioThreads.get(procIndex);
         if (readerThread.buffer != null) {
-            readerThread.buffer.delete(0, readerThread.buffer.length());
+            readerThread.buffer = new StringBuilder();
         }
     }
 
