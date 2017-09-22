@@ -494,6 +494,10 @@ public class AppForker {
 					logger.log(Level.DEBUG, "", e);
 				}
 			}
+			
+			if (this.buffer != null) {
+			    this.buffer.delete(0, this.buffer.length());
+			}
 		}
 	}
 
