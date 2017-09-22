@@ -181,6 +181,13 @@ public class AppForker {
         
         return null;
     }
+    
+    public void clearOutputBuffer(int procIndex) {
+        StreamReaderThread readerThread = this.ioThreads.get(procIndex);
+        if (readerThread.buffer != null) {
+            readerThread.buffer.delete(0, readerThread.buffer.length());
+        }
+    }
 
     /**
 	 * <p>Starts the programs specified in {@link #getProgramArgs()} each in its own JVM. If {@link #isWaitForJVMs()} returns 
