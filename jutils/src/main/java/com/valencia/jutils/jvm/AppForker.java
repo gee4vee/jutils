@@ -15,7 +15,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -37,7 +37,9 @@ public class AppForker {
 
 	protected static final Logger logger = Logger.getLogger(AppForker.class);
 
-	private List<String[]> programArgs = new ArrayList<>();
+	public static final String JUNIT_RUNNER_CLASS_NAME = "org.junit.runner.JUnitCore";
+
+    private List<String[]> programArgs = new ArrayList<>();
 	private long waitTimeBeforeKill = Long.MAX_VALUE;
 	private HeapSpec[] heapSpecs;
 	private boolean waitForJVMs = true;
@@ -48,6 +50,8 @@ public class AppForker {
     private File redirectOutputFile;
 
     private boolean redirectOutputToConsoleAndLogFile = true;
+    
+    private boolean bufferOutput = false;
 
 	public AppForker(List<String[]> programArgs) {
 		this.programArgs.clear();
@@ -159,10 +163,26 @@ public class AppForker {
     public void setRedirectOutputToConsoleAndFile(boolean read) {
         this.redirectOutputToConsoleAndLogFile = read;
     }
+    
+    public boolean isBufferOutput() {
+        return this.bufferOutput;
+    }
+    
+    public void setBufferOutput(boolean set) {
+        this.bufferOutput = set;
+    }
+    
+    public String getBufferedOutput(int procIndex) {
+        StreamReaderThread readerThread = this.ioThreads.get(procIndex);
+        if (readerThread.buffer != null) {
+            String output = readerThread.buffer.toString();
+            return output;
+        }
+        
+        return null;
+    }
 
-    public static final String JUNIT_RUNNER_CLASS_NAME = "org.junit.runner.JUnitCore";
-
-	/**
+    /**
 	 * <p>Starts the programs specified in {@link #getProgramArgs()} each in its own JVM. If {@link #isWaitForJVMs()} returns 
 	 * <code>true</code>, this method will block until all the processes terminate or the time specified by 
 	 * {@link #getWaitTimeBeforeKill()} elapses, after which the processes will be terminated. Otherwise the method 
@@ -233,7 +253,7 @@ public class AppForker {
 		}
 
 		procIndex = 0;
-		Map<ProcessBuilder, Process> jvms = new HashMap<>();
+		Map<ProcessBuilder, Process> jvms = new LinkedHashMap<>();
 		for (ProcessBuilder builder : procBuilders) {
 			if (logger.isEnabledFor(Level.INFO)) {
 				logger.info("Starting JVM with args: " + StringUtils.join(builder.command().iterator(), " "));
@@ -325,7 +345,7 @@ public class AppForker {
 	}
 
 	private StreamReaderThread getStreamReaderThread(int procIndex, Process process) {
-		StreamReaderThread ioThread = new StreamReaderThread(process.getInputStream(), "JVM#" + (procIndex + 1), false);
+		StreamReaderThread ioThread = new StreamReaderThread(process.getInputStream(), "JVM#" + (procIndex + 1), this.bufferOutput);
 		return ioThread;
 	}
 
@@ -441,7 +461,7 @@ public class AppForker {
 		}
 
 		public void run() {
-			consumeStream(is, name, fileOs, buffer, true);
+			consumeStreamToFileAndBuffer(is, name, fileOs, buffer, true);
 			consumeCompleted = true;
 		}
 
@@ -470,7 +490,7 @@ public class AppForker {
 		}
 	}
 
-    public static void consumeStream(InputStream is, String streamName, FileWriter fileOs, StringBuilder outputBuffer, boolean consumeFully) {
+    public static void consumeStreamToFileAndBuffer(InputStream is, String streamName, FileWriter fileOs, StringBuilder outputBuffer, boolean consumeFully) {
         BufferedInputStream bufferedInputStream = null;
         try {
             bufferedInputStream = new BufferedInputStream(is);
