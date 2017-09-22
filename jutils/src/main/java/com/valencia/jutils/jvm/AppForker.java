@@ -185,7 +185,7 @@ public class AppForker {
     public void clearOutputBuffer(int procIndex) {
         StreamReaderThread readerThread = this.ioThreads.get(procIndex);
         if (readerThread.buffer != null) {
-            readerThread.buffer = new StringBuilder();
+            readerThread.buffer.delete(0, readerThread.buffer.length());
         }
     }
 
@@ -470,11 +470,6 @@ public class AppForker {
 		public void run() {
 			consumeStreamToFileAndBuffer(is, name, fileOs, buffer, true);
 			consumeCompleted = true;
-		}
-
-		@SuppressWarnings("unused")
-		public StringBuilder getOutputBuffer() {
-			return buffer;
 		}
 
 		void stopAndClose() {
