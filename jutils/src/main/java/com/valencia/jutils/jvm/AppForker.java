@@ -471,10 +471,6 @@ public class AppForker {
 	}
 
     public static void consumeStream(InputStream is, String streamName, FileWriter fileOs, StringBuilder outputBuffer, boolean consumeFully) {
-        consumeStreamFast(is, streamName, fileOs, outputBuffer, consumeFully);
-    }
-
-    public static void consumeStreamFast(InputStream is, String streamName, FileWriter fileOs, StringBuilder outputBuffer, boolean consumeFully) {
         BufferedInputStream bufferedInputStream = null;
         try {
             bufferedInputStream = new BufferedInputStream(is);
