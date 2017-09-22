@@ -47,7 +47,7 @@ public class AppForker {
 
     private File redirectOutputFile;
 
-    private boolean readOutputToConsoleAndLogFile = true;
+    private boolean redirectOutputToConsoleAndLogFile = true;
 
 	public AppForker(List<String[]> programArgs) {
 		this.programArgs.clear();
@@ -144,10 +144,6 @@ public class AppForker {
 		this.setupProgramHeapSpec = setupProgramHeapSpec;
 	}
 	
-	public void redirectOutputToFile(File outputFile) {
-	    this.redirectOutputFile = outputFile;
-	}
-	
 	public File getRedirectOutputFile() {
         return redirectOutputFile;
     }
@@ -156,12 +152,12 @@ public class AppForker {
         this.redirectOutputFile = redirectOutputFile;
     }
 
-    public boolean isReadOutputToConsoleAndFile() {
-        return readOutputToConsoleAndLogFile;
+    public boolean isRedirectOutputToConsoleAndFile() {
+        return redirectOutputToConsoleAndLogFile;
     }
 
-    public void setReadOutputToConsoleAndFile(boolean read) {
-        this.readOutputToConsoleAndLogFile = read;
+    public void setRedirectOutputToConsoleAndFile(boolean read) {
+        this.redirectOutputToConsoleAndLogFile = read;
     }
 
     public static final String JUNIT_RUNNER_CLASS_NAME = "org.junit.runner.JUnitCore";
@@ -227,7 +223,7 @@ public class AppForker {
 			// redirect stderr to stdin so its merged
 			processBuilder.redirectErrorStream(true);
 			Process process = processBuilder.start();
-			if (this.redirectOutputFile == null && this.readOutputToConsoleAndLogFile) {
+			if (this.redirectOutputFile == null && this.redirectOutputToConsoleAndLogFile) {
 	            // separate thread will print stdout and stderr to console and log file
 	            StreamReaderThread ioThread = getStreamReaderThread(procIndex, process);
 	            ioThread.start();
@@ -243,7 +239,7 @@ public class AppForker {
 				logger.info("Starting JVM with args: " + StringUtils.join(builder.command().iterator(), " "));
 			}
 			Process process = builder.start();
-            if (this.redirectOutputFile == null && this.readOutputToConsoleAndLogFile) {
+            if (this.redirectOutputFile == null && this.redirectOutputToConsoleAndLogFile) {
                 // separate thread will print stdout and stderr to console and log file
                 StreamReaderThread ioThread = getStreamReaderThread(procIndex, process);
                 ioThread.start();
@@ -445,7 +441,7 @@ public class AppForker {
 		}
 
 		public void run() {
-			consumeStream(is, name, buffer, true);
+			consumeStream(is, name, fileOs, buffer, true);
 			consumeCompleted = true;
 		}
 
@@ -472,50 +468,50 @@ public class AppForker {
 				}
 			}
 		}
-
-		void consumeStream(InputStream is, String streamName, StringBuilder outputBuffer, boolean consumeFully) {
-			consumeStreamFast(is, streamName, outputBuffer, consumeFully);
-		}
-
-		void consumeStreamFast(InputStream is, String streamName, StringBuilder outputBuffer, boolean consumeFully) {
-			BufferedInputStream bufferedInputStream = null;
-			try {
-				bufferedInputStream = new BufferedInputStream(is);
-				int len = 1024;
-				byte[] b = new byte[len];
-				for (;;) {
-					int ret = bufferedInputStream.read(b, 0, len);
-					if (ret == -1)
-						break;
-					String grab = new String(b, 0, ret);
-					logger.log(Level.INFO, streamName + ": " + grab);
-					if (outputBuffer != null) {
-						outputBuffer.append(grab);
-					}
-					if (this.fileOs != null) {
-						this.fileOs.write(grab);
-					}
-
-					if (!consumeFully && is.available() == 0) {
-						return;
-					}
-				}
-			} catch (IOException ioe) {
-				logger.warn("An exception occurred while processing child process stream " + streamName, ioe);
-			} finally {
-				try {
-					if (bufferedInputStream != null) {
-						bufferedInputStream.close();
-					}
-					if (fileOs != null) {
-						fileOs.close();
-					}
-				} catch (IOException e) {
-				}
-
-			}
-		}
 	}
+
+    public void consumeStream(InputStream is, String streamName, FileWriter fileOs, StringBuilder outputBuffer, boolean consumeFully) {
+        consumeStreamFast(is, streamName, fileOs, outputBuffer, consumeFully);
+    }
+
+    public void consumeStreamFast(InputStream is, String streamName, FileWriter fileOs, StringBuilder outputBuffer, boolean consumeFully) {
+        BufferedInputStream bufferedInputStream = null;
+        try {
+            bufferedInputStream = new BufferedInputStream(is);
+            int len = 1024;
+            byte[] b = new byte[len];
+            for (;;) {
+                int ret = bufferedInputStream.read(b, 0, len);
+                if (ret == -1)
+                    break;
+                String grab = new String(b, 0, ret);
+                logger.log(Level.INFO, streamName + ": " + grab);
+                if (outputBuffer != null) {
+                    outputBuffer.append(grab);
+                }
+                if (fileOs != null) {
+                    fileOs.write(grab);
+                }
+
+                if (!consumeFully && is.available() == 0) {
+                    return;
+                }
+            }
+        } catch (IOException ioe) {
+            logger.warn("An exception occurred while processing child process stream " + streamName, ioe);
+        } finally {
+            try {
+                if (bufferedInputStream != null) {
+                    bufferedInputStream.close();
+                }
+                if (fileOs != null) {
+                    fileOs.close();
+                }
+            } catch (IOException e) {
+            }
+
+        }
+    }
 
 	/**
 	 * A specification for heap size of a JVM.
