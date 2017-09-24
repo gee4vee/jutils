@@ -548,7 +548,7 @@ public class ConsoleApp {
      */
     public <I, O> void startInteraction(Map<String, Function<String, String>> inputHandlers, Function<String, String> exitHandler) 
             throws Exception {
-        this.print("Welcome to " + this.getName() + " " + this.getVersion());
+        this.println("Welcome to " + this.getName() + " " + this.getVersion());
         String input = "";
         boolean firstTime = true;
         while (true) {
@@ -567,10 +567,10 @@ public class ConsoleApp {
 
             if (INPUT_EXIT.equalsIgnoreCase(input)) {
                 if (exitHandler != null) {
-                    this.print("Exiting...");
-                    this.print(exitHandler.apply(input));
+                    this.println("Exiting...");
+                    this.println(exitHandler.apply(input));
                 }
-                this.print("Goodbye!");
+                this.println("Goodbye!");
                 break;
             }
 
@@ -586,14 +586,14 @@ public class ConsoleApp {
             String argName = valueSplit[0];
             ConsoleArg arg = this.getArg(argName);
             if (arg == null) {
-                this.print("\tUnexpected input " + argName);
+                this.println("\tUnexpected input " + argName);
                 continue;
             }
             
             if (!InputType.NONE.equals(arg.getInputType())) {
                 if (valueSplit.length < 2) {
                     String numValuesRequired = arg.isMultivalued() ? "at least one" : "one";
-                    this.print("Argument " + argName + " requires " + numValuesRequired + " input values.");
+                    this.println("Argument " + argName + " requires " + numValuesRequired + " input values.");
                     continue;
                 }
                 String value = valueSplit[1];
@@ -601,12 +601,12 @@ public class ConsoleApp {
             }
 
             if (!InputType.NONE.equals(arg.getInputType()) && this.argType.equals(ArgType.KEY_VALUE_PAIR) && !input.contains(EQUAL)) {
-                this.print("\tInput is expected in key-value pair form, e.g. ArgName=ArgValue.");
+                this.println("\tInput is expected in key-value pair form, e.g. ArgName=ArgValue.");
                 continue;
             }
 
             if (inputHandlers == null) {
-                this.printNewLine();
+                this.println();
                 continue;
             }
 
@@ -618,12 +618,12 @@ public class ConsoleApp {
             }
 
             if (callback == null) {
-                this.print("No input handler for " + input);
+                this.println("No input handler for " + input);
             } else {
                 String output = callback.apply(input);
-                this.print("Result: " + output);
+                this.println("Result: " + output);
             }
-            this.printNewLine();
+            this.println();
         }
     }
     
@@ -632,7 +632,16 @@ public class ConsoleApp {
      * 
      * @param msg The message to print.
      */
-    public void print(String msg) {
+    public void println(String msg) {
+        this.printlnOut(msg);
+    }
+    
+    /**
+     * Prints the specified message to stdout as well as the current logger.
+     * 
+     * @param msg The message to print.
+     */
+    public void printlnOut(String msg) {
         msg = ">> " + msg;
         System.out.println(msg);
         if (this.logger != null) {
@@ -640,7 +649,38 @@ public class ConsoleApp {
         }
     }
     
-    public void printNewLine() {
+    public void printlnOut(String msg, Throwable t) {
+        msg = ">> " + msg;
+        System.out.println(msg);
+        t.printStackTrace(System.out);
+        if (this.logger != null) {
+            this.logger.info(msg, t);
+        }
+    }
+    
+    public void printlnErr(String msg, Throwable t) {
+        msg = ">> " + msg;
+        System.err.println(msg);
+        t.printStackTrace(System.err);
+        if (this.logger != null) {
+            this.logger.error(msg, t);
+        }
+    }
+    
+    /**
+     * Prints the specified message to stderr as well as the current logger.
+     * 
+     * @param msg The message to print.
+     */
+    public void printlnErr(String msg) {
+        msg = ">> " + msg;
+        System.err.println(msg);
+        if (this.logger != null) {
+            this.logger.error(msg);
+        }
+    }
+    
+    public void println() {
         System.out.println();
         this.logger.info("\n");
     }
@@ -653,7 +693,7 @@ public class ConsoleApp {
     }
 
     private void printAvailableInteractiveOptions(boolean printAllOptions) {
-        this.print("Please enter one of the available options, " + INPUT_HELP + " to display the available options, or "
+        this.println("Please enter one of the available options, " + INPUT_HELP + " to display the available options, or "
                 + INPUT_EXIT + " to exit immediately:");
         if (printAllOptions) {
             List<ConsoleArg> interactiveArgs = this.getInteractiveArgs();
@@ -674,7 +714,7 @@ public class ConsoleApp {
                     }
                 }
                 sb.append(" - ").append(arg.getDescription());
-                this.print(sb.toString());
+                this.println(sb.toString());
             }
         }
     }
