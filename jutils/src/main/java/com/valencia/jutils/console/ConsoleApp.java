@@ -17,6 +17,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.valencia.jutils.console.ConsoleArg.InputType;
 
 /**
@@ -54,6 +57,7 @@ public class ConsoleApp {
     private final List<ConsoleArg> args = new ArrayList<>();
     private ArgType argType;
     private String description;
+    private Logger logger = LogManager.getLogger(ConsoleApp.class);
 
     /**
      * 
@@ -66,6 +70,16 @@ public class ConsoleApp {
 
     public ConsoleApp(String name, String version) {
         this(name, version, ArgType.KEY_VALUE_PAIR);
+    }
+
+    public ConsoleApp(String name, String version, Logger logger) {
+        this(name, version);
+        this.logger = logger;
+    }
+    
+    public ConsoleApp(String name, String version, ArgType type, Logger logger) {
+        this(name, version, type);
+        this.logger = logger;
     }
 
     public String getName() {
@@ -253,7 +267,7 @@ public class ConsoleApp {
         if (this.argType.equals(ArgType.KEY_VALUE_PAIR)) {
             for (String arg : args) {
                 if (INPUT_HELP.equalsIgnoreCase(arg)) {
-                    System.out.println(getUsage());
+                    System.err.println(getUsage());
                     continue;
                 }
 
@@ -289,7 +303,7 @@ public class ConsoleApp {
             for (int i = 0; i < args.length; i += 2) {
                 String argName = args[i];
                 if (INPUT_HELP.equalsIgnoreCase(argName)) {
-                    System.out.println(getUsage());
+                    System.err.println(getUsage());
                     continue;
                 }
                 
@@ -534,7 +548,7 @@ public class ConsoleApp {
      */
     public <I, O> void startInteraction(Map<String, Function<String, String>> inputHandlers, Function<String, String> exitHandler) 
             throws Exception {
-        System.out.println("Welcome to " + this.getName() + " " + this.getVersion());
+        this.print("Welcome to " + this.getName() + " " + this.getVersion());
         String input = "";
         boolean firstTime = true;
         while (true) {
@@ -553,10 +567,10 @@ public class ConsoleApp {
 
             if (INPUT_EXIT.equalsIgnoreCase(input)) {
                 if (exitHandler != null) {
-                    System.out.println("Exiting...");
-                    System.out.println(exitHandler.apply(input));
+                    this.print("Exiting...");
+                    this.print(exitHandler.apply(input));
                 }
-                System.out.println("Goodbye!");
+                this.print("Goodbye!");
                 break;
             }
 
@@ -572,14 +586,14 @@ public class ConsoleApp {
             String argName = valueSplit[0];
             ConsoleArg arg = this.getArg(argName);
             if (arg == null) {
-                System.out.println("\tUnexpected input " + argName);
+                this.print("\tUnexpected input " + argName);
                 continue;
             }
             
             if (!InputType.NONE.equals(arg.getInputType())) {
                 if (valueSplit.length < 2) {
                     String numValuesRequired = arg.isMultivalued() ? "at least one" : "one";
-                    System.out.println("Argument " + argName + " requires " + numValuesRequired + " input values.");
+                    this.print("Argument " + argName + " requires " + numValuesRequired + " input values.");
                     continue;
                 }
                 String value = valueSplit[1];
@@ -587,12 +601,12 @@ public class ConsoleApp {
             }
 
             if (!InputType.NONE.equals(arg.getInputType()) && this.argType.equals(ArgType.KEY_VALUE_PAIR) && !input.contains(EQUAL)) {
-                System.out.println("\tInput is expected in key-value pair form, e.g. ArgName=ArgValue.");
+                this.print("\tInput is expected in key-value pair form, e.g. ArgName=ArgValue.");
                 continue;
             }
 
             if (inputHandlers == null) {
-                System.out.println();
+                this.printNewLine();
                 continue;
             }
 
@@ -604,13 +618,31 @@ public class ConsoleApp {
             }
 
             if (callback == null) {
-                System.out.println("No input handler for " + input);
+                this.print("No input handler for " + input);
             } else {
                 String output = callback.apply(input);
-                System.out.println("Result: " + output);
+                this.print("Result: " + output);
             }
-            System.out.println();
+            this.printNewLine();
         }
+    }
+    
+    /**
+     * Prints the specified message to stdout as well as the current logger.
+     * 
+     * @param msg The message to print.
+     */
+    public void print(String msg) {
+        msg = ">> " + msg;
+        System.out.println(msg);
+        if (this.logger != null) {
+            this.logger.info(msg);
+        }
+    }
+    
+    public void printNewLine() {
+        System.out.println();
+        this.logger.info("\n");
     }
 
     private String getInput() throws IOException {
@@ -621,7 +653,7 @@ public class ConsoleApp {
     }
 
     private void printAvailableInteractiveOptions(boolean printAllOptions) {
-        System.out.println("Please enter one of the available options, " + INPUT_HELP + " to display the available options, or "
+        this.print("Please enter one of the available options, " + INPUT_HELP + " to display the available options, or "
                 + INPUT_EXIT + " to exit immediately:");
         if (printAllOptions) {
             List<ConsoleArg> interactiveArgs = this.getInteractiveArgs();
@@ -642,7 +674,7 @@ public class ConsoleApp {
                     }
                 }
                 sb.append(" - ").append(arg.getDescription());
-                System.out.println(sb.toString());
+                this.print(sb.toString());
             }
         }
     }

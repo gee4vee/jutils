@@ -21,8 +21,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * <p>Runs specified programs in separate JVMs. Supports setting the heap size for each of the JVMs separately 
@@ -35,7 +36,7 @@ import org.apache.log4j.Logger;
  */
 public class AppForker {
 
-	protected static final Logger logger = Logger.getLogger(AppForker.class);
+	protected static final Logger logger = LogManager.getLogger(AppForker.class);
 
 	public static final String JUNIT_RUNNER_CLASS_NAME = "org.junit.runner.JUnitCore";
 
@@ -244,7 +245,7 @@ public class AppForker {
 			}
 
 			ProcessBuilder processBuilder = new ProcessBuilder(progArgs);
-			if (logger.isEnabledFor(Level.INFO)) {
+			if (logger.isEnabled(Level.INFO)) {
 				logger.info("Starting setup program with args: " + StringUtils.join(processBuilder.command().iterator(), " "));
 			}
 			// redirect stderr to stdin so its merged
@@ -262,7 +263,7 @@ public class AppForker {
 		procIndex = 0;
 		Map<ProcessBuilder, Process> jvms = new LinkedHashMap<>();
 		for (ProcessBuilder builder : procBuilders) {
-			if (logger.isEnabledFor(Level.INFO)) {
+			if (logger.isEnabled(Level.INFO)) {
 				logger.info("Starting JVM with args: " + StringUtils.join(builder.command().iterator(), " "));
 			}
 			Process process = builder.start();
@@ -358,7 +359,7 @@ public class AppForker {
 
 	private void waitForJVM(ProcessBuilder builder, Process jvm) {
 		String args = StringUtils.join(builder.command().iterator(), " ");
-		if (logger.isEnabledFor(Level.INFO)) {
+		if (logger.isEnabled(Level.INFO)) {
 			logger.info("Waiting for exit of JVM with args: " + args);
 		}
 
