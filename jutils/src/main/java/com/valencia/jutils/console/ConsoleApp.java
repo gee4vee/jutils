@@ -642,7 +642,7 @@ public class ConsoleApp {
      * @param msg The message to print.
      */
     public void printlnOut(String msg) {
-        msg = ">> " + msg;
+        msg = "> " + msg;
         System.out.println(msg);
         if (this.logger != null) {
             this.logger.info(msg);
@@ -650,7 +650,7 @@ public class ConsoleApp {
     }
     
     public void printlnOut(String msg, Throwable t) {
-        msg = ">> " + msg;
+        msg = "> " + msg;
         System.out.println(msg);
         t.printStackTrace(System.out);
         if (this.logger != null) {
@@ -659,7 +659,7 @@ public class ConsoleApp {
     }
     
     public void printlnErr(String msg, Throwable t) {
-        msg = ">> " + msg;
+        msg = "> " + msg;
         System.err.println(msg);
         t.printStackTrace(System.err);
         if (this.logger != null) {
@@ -673,7 +673,7 @@ public class ConsoleApp {
      * @param msg The message to print.
      */
     public void printlnErr(String msg) {
-        msg = ">> " + msg;
+        msg = "> " + msg;
         System.err.println(msg);
         if (this.logger != null) {
             this.logger.error(msg);
