@@ -191,6 +191,23 @@ public class AppForker {
     }
 
     /**
+     * <p>Starts the programs specified in {@link #getProgramArgs()} each in its own JVM. If {@link #isWaitForJVMs()} returns 
+     * <code>true</code>, this method will block until all the processes terminate or the time specified by 
+     * {@link #getWaitTimeBeforeKill()} elapses, after which the processes will be terminated. Otherwise the method 
+     * will return immediately and leave the newly created child processes running.
+     * 
+     * <p>After this method returns, a call to {@link #close()} should be made.
+     * 
+     * @return A <code>Map</code> of the <code>ProcessBuilder</code> and associated <code>Process</code> instances that 
+     * were created and executed.
+     * 
+     * @throws Exception
+     */
+    public Map<ProcessBuilder, Process> execute() throws Exception {
+        return this.execute(0);
+    }
+
+    /**
 	 * <p>Starts the programs specified in {@link #getProgramArgs()} each in its own JVM. If {@link #isWaitForJVMs()} returns 
 	 * <code>true</code>, this method will block until all the processes terminate or the time specified by 
 	 * {@link #getWaitTimeBeforeKill()} elapses, after which the processes will be terminated. Otherwise the method 
@@ -203,7 +220,7 @@ public class AppForker {
 	 * 
 	 * @throws Exception
 	 */
-	public Map<ProcessBuilder, Process> execute() throws Exception {
+	public Map<ProcessBuilder, Process> execute(int procId) throws Exception {
 		List<ProcessBuilder> procBuilders = new ArrayList<>();
 		int procIndex = 0;
 		for (String[] args : this.programArgs) {
@@ -253,7 +270,7 @@ public class AppForker {
 			Process process = processBuilder.start();
 			if (this.redirectOutputFile == null && this.redirectOutputToConsoleAndLogFile) {
 	            // separate thread will print stdout and stderr to console and log file
-	            StreamReaderThread ioThread = getStreamReaderThread(procIndex, process);
+	            StreamReaderThread ioThread = getStreamReaderThread(procId + procIndex, process);
 	            ioThread.start();
 	            this.ioThreads.add(ioThread);
 			}
@@ -269,7 +286,7 @@ public class AppForker {
 			Process process = builder.start();
             if (this.redirectOutputFile == null && this.redirectOutputToConsoleAndLogFile) {
                 // separate thread will print stdout and stderr to console and log file
-                StreamReaderThread ioThread = getStreamReaderThread(procIndex, process);
+                StreamReaderThread ioThread = getStreamReaderThread(procId + procIndex, process);
                 ioThread.start();
                 this.ioThreads.add(ioThread);
             }
