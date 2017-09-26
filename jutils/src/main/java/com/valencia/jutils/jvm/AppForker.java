@@ -215,6 +215,8 @@ public class AppForker {
 	 * 
 	 * <p>After this method returns, a call to {@link #close()} should be made.
 	 * 
+	 * @param procId The ID of the process. Used to ID identify multiple processes in log file names.
+	 * 
 	 * @return A <code>Map</code> of the <code>ProcessBuilder</code> and associated <code>Process</code> instances that 
 	 * were created and executed.
 	 * 
@@ -270,7 +272,7 @@ public class AppForker {
 			Process process = processBuilder.start();
 			if (this.redirectOutputFile == null && this.redirectOutputToConsoleAndLogFile) {
 	            // separate thread will print stdout and stderr to console and log file
-	            StreamReaderThread ioThread = getStreamReaderThread(procId + procIndex, process);
+	            StreamReaderThread ioThread = getStreamReaderThread(procId, procIndex, process);
 	            ioThread.start();
 	            this.ioThreads.add(ioThread);
 			}
@@ -286,7 +288,7 @@ public class AppForker {
 			Process process = builder.start();
             if (this.redirectOutputFile == null && this.redirectOutputToConsoleAndLogFile) {
                 // separate thread will print stdout and stderr to console and log file
-                StreamReaderThread ioThread = getStreamReaderThread(procId + procIndex, process);
+                StreamReaderThread ioThread = getStreamReaderThread(procId, procIndex, process);
                 ioThread.start();
                 this.ioThreads.add(ioThread);
             }
@@ -369,8 +371,9 @@ public class AppForker {
 		}
 	}
 
-	private StreamReaderThread getStreamReaderThread(int procIndex, Process process) {
-		StreamReaderThread ioThread = new StreamReaderThread(process.getInputStream(), "JVM#" + (procIndex + 1), this.bufferOutput);
+	private StreamReaderThread getStreamReaderThread(int procId, int procIndex, Process process) {
+		String id = "JVM#" + procId + "_" + (procIndex + 1);
+        StreamReaderThread ioThread = new StreamReaderThread(process.getInputStream(), id, this.bufferOutput);
 		return ioThread;
 	}
 
