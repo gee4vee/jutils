@@ -621,7 +621,7 @@ public class ConsoleApp {
                 this.println("No input handler for " + input);
             } else {
                 String output = callback.apply(input);
-                this.println("Result: " + output);
+                this.println("Result of " + argName + ": " + output);
             }
             this.println();
         }
