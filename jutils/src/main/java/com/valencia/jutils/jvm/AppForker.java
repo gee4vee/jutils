@@ -47,6 +47,7 @@ public class AppForker {
 	private List<String> junitClasses = new ArrayList<>();
 	private String[] setupProgramArgs;
 	private HeapSpec setupProgramHeapSpec;
+    private List<String> systemProps = new ArrayList<>();
 
     private File redirectOutputFile;
 
@@ -132,6 +133,23 @@ public class AppForker {
 	public void setJunitClasses(List<String> junitClasses) {
 		this.junitClasses = junitClasses;
 	}
+
+    public List<String> getSystemProperties() {
+        return this.systemProps;
+    }
+
+    public void setSystemProperties(List<String> systemProps) {
+        this.systemProps = systemProps;
+    }
+    
+    /**
+     * Adds the specified system properties. Each argument should be a key-value pair, e.g. propName=value. Do not include the -D prefix.
+     */
+    public void addSystemProperties(String... props) {
+        for (String prop : props) {
+            this.systemProps.add(prop);
+        }
+    }
 
 	public String[] getSetupProgramArgs() {
 		return this.setupProgramArgs;
@@ -434,18 +452,25 @@ public class AppForker {
 			// surround with quotes in windows platform
 			classpath = "\"" + classpath + "\"";
 		}
-		String path = System.getProperty("java.home") + separator + "bin" + separator + "java";
+		String javaCmdPath = System.getProperty("java.home") + separator + "bin" + separator + "java";
 		if (Platform.get().equals(Platform.WINDOWS)) {
 			// surround with quotes in windows platform
-			path = "\"" + path + "\"";
+			javaCmdPath = "\"" + javaCmdPath + "\"";
 		}
 
 		List<String> progArgs = new ArrayList<>();
-		progArgs.add(path);
+		progArgs.add(javaCmdPath);
 		if (heapSpec != null) {
 			String heapSpecStr = heapSpec.getJavaCmdString();
 			progArgs.add(heapSpecStr);
 		}
+		
+		if (this.systemProps.size() > 0) {
+		    for (String sysProp : this.systemProps) {
+                progArgs.add("-D" + sysProp);
+            }
+		}
+		
 		progArgs.add("-cp");
 		progArgs.add(classpath);
 		return progArgs;
