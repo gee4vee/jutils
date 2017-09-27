@@ -54,6 +54,8 @@ public class AppForker {
     private boolean redirectOutputToConsoleAndLogFile = true;
     
     private boolean bufferOutput = false;
+    
+    private Level consoleOutputLogLevel = Level.INFO;
 
 	public AppForker(List<String[]> programArgs) {
 		this.programArgs.clear();
@@ -206,6 +208,14 @@ public class AppForker {
         if (readerThread.buffer != null) {
             readerThread.buffer.delete(0, readerThread.buffer.length());
         }
+    }
+
+    public Level getConsoleOutputLogLevel() {
+        return consoleOutputLogLevel;
+    }
+
+    public void setConsoleOutputLogLevel(Level consoleOutputLogLevel) {
+        this.consoleOutputLogLevel = consoleOutputLogLevel;
     }
 
     /**
@@ -484,6 +494,7 @@ public class AppForker {
 		String name;
 		StringBuilder buffer;
 		FileWriter fileOs;
+		Level logLevel = AppForker.this.consoleOutputLogLevel;
 
 		@SuppressWarnings("unused")
 		boolean consumeCompleted = false; // TODO: Might need a fix - volatile 
@@ -495,6 +506,9 @@ public class AppForker {
 			this.setName("StreamReaderThread_" + name);
 			this.is = is;
 			this.name = name;
+			if (this.logLevel == null) {
+			    this.logLevel = Level.INFO;
+			}
 			if (bufferData) {
 				buffer = new StringBuilder(1024);
 			}
@@ -514,7 +528,7 @@ public class AppForker {
 		}
 
 		public void run() {
-			consumeStreamToFileAndBuffer(is, name, fileOs, buffer, true);
+			consumeStreamToFileAndBuffer(is, name, fileOs, buffer, true, this.logLevel);
 			consumeCompleted = true;
 		}
 
@@ -542,7 +556,8 @@ public class AppForker {
 		}
 	}
 
-    public static void consumeStreamToFileAndBuffer(InputStream is, String streamName, FileWriter fileOs, StringBuilder outputBuffer, boolean consumeFully) {
+    public static void consumeStreamToFileAndBuffer(InputStream is, String streamName, FileWriter fileOs, StringBuilder outputBuffer, boolean consumeFully, 
+            Level logLevel) {
         BufferedInputStream bufferedInputStream = null;
         try {
             bufferedInputStream = new BufferedInputStream(is);
@@ -553,7 +568,7 @@ public class AppForker {
                 if (ret == -1)
                     break;
                 String grab = new String(b, 0, ret);
-                logger.log(Level.INFO, streamName + ": " + grab);
+                logger.log(logLevel, streamName + ": " + grab);
                 if (outputBuffer != null) {
                     outputBuffer.append(grab);
                 }
