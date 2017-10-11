@@ -41,6 +41,7 @@ public class AppForker {
 	public static final String JUNIT_RUNNER_CLASS_NAME = "org.junit.runner.JUnitCore";
 
     private List<String[]> programArgs = new ArrayList<>();
+    private List<String> classpathDirs = new ArrayList<>();
 	private long waitTimeBeforeKill = Long.MAX_VALUE;
 	private HeapSpec[] heapSpecs;
 	private boolean waitForJVMs = true;
@@ -150,6 +151,28 @@ public class AppForker {
     public void addSystemProperties(String... props) {
         for (String prop : props) {
             this.systemProps.add(prop);
+        }
+    }
+
+    /**
+     * Returns additional class path directories that will be added to the classpath.
+     * @return
+     */
+    public List<String> getClasspathDirs() {
+        return this.classpathDirs;
+    }
+
+    public void setClasspathDirs(List<String> dirs) {
+        this.classpathDirs = dirs;
+    }
+    
+    /**
+     * Adds the specified class path directories. Each argument should be a directory path which will be added as-is to the JVM's 
+     * class path specification.
+     */
+    public void addClasspathDirs(String... dirs) {
+        for (String dir : dirs) {
+            this.classpathDirs.add(dir);
         }
     }
 
@@ -456,8 +479,15 @@ public class AppForker {
 		String cwd = System.getProperty("user.dir");
 		String separator = System.getProperty("file.separator");
 		// support execution from RAD/Eclipse
-		String classpath = System.getProperty("java.class.path") + File.pathSeparator + cwd
-				+ File.pathSeparator + cwd + File.separator + "test";
+		String classpath = System.getProperty("java.class.path") + File.pathSeparator 
+		                    + cwd + File.pathSeparator 
+		                    + cwd + File.separator + "test";
+		if (!this.classpathDirs.isEmpty()) {
+		    for (String dir : this.classpathDirs) {
+                classpath += File.pathSeparator + dir;
+            }
+		}
+		
 		if (Platform.get().equals(Platform.WINDOWS)) {
 			// surround with quotes in windows platform
 			classpath = "\"" + classpath + "\"";
