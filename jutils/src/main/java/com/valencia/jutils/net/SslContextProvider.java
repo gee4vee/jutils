@@ -25,7 +25,7 @@ public interface SslContextProvider {
     public TrustManager[] getTrustManagers() throws GeneralSecurityException, IOException;
     
     /**
-     * Returns the server key managers available to this provider.
+     * Returns the key managers available to this provider to be used for creating server sockets.
      * 
      * @throws GeneralSecurityException
      * @throws IOException
@@ -33,7 +33,7 @@ public interface SslContextProvider {
     public KeyManager[] getServerKeyManagers() throws GeneralSecurityException, IOException;
     
     /**
-     * Returns the client key managers available to this provider.
+     * Returns the key managers available to this provider to be used for creating client sockets.
      * 
      * @throws GeneralSecurityException
      * @throws IOException

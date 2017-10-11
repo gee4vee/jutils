@@ -37,7 +37,7 @@ import javax.net.ssl.TrustManagerFactory;
  * 
  * @author Gabriel Valencia, gee4vee@me.com
  */
-public class SslUtil {
+public class SslUtils {
     
     private static final String JKS = "JKS";
 
@@ -64,53 +64,33 @@ public class SslUtil {
         return kmf.getKeyManagers();
     }
 
-    public static SSLContext createServerSSLContext(SslContextProvider provider) throws Exception {
-        SSLContext context;
-        try {
-            context = SSLContext.getInstance(provider.getProtocol());
-            context.init(provider.getServerKeyManagers(), provider.getTrustManagers(), new SecureRandom());
-        } catch (GeneralSecurityException | IOException e) {
-            throw new Exception("Unable to create SSL context", e);
-        }
+    public static SSLContext createServerSSLContext(SslContextProvider provider) throws IOException, GeneralSecurityException {
+        SSLContext context = SSLContext.getInstance(provider.getProtocol());
+        context.init(provider.getServerKeyManagers(), provider.getTrustManagers(), new SecureRandom());
         return context;
     }
 
-    public static SSLContext createClientSSLContext(SslContextProvider provider) throws Exception {
-        SSLContext context;
-        try {
-            context = SSLContext.getInstance(provider.getProtocol());
-            context.init(provider.getClientKeyManagers(), provider.getTrustManagers(), new SecureRandom());
-        } catch (GeneralSecurityException | IOException e) {
-            throw new Exception("Unable to create SSL context", e);
-        }
+    public static SSLContext createClientSSLContext(SslContextProvider provider) throws IOException, GeneralSecurityException {
+        SSLContext context = SSLContext.getInstance(provider.getProtocol());
+        context.init(provider.getClientKeyManagers(), provider.getTrustManagers(), new SecureRandom());
         return context;
     }
 
-    public static SSLServerSocket createSSLServerSocket(int port, SslContextProvider provider) throws Exception {
+    public static SSLServerSocket createSSLServerSocket(int port, SslContextProvider provider) throws IOException, GeneralSecurityException {
         SSLContext context = createServerSSLContext(provider);
         SSLServerSocketFactory factory = context.getServerSocketFactory();
-        SSLServerSocket socket;
-        try {
-            socket = (SSLServerSocket) factory.createServerSocket(port);
-            socket.setEnabledProtocols(new String[] { provider.getProtocol() });
-            socket.setNeedClientAuth(true);
-            return socket;
-        } catch (IOException e) {
-            throw new Exception("Unable to create SSL server socket", e);
-        }
+        SSLServerSocket socket = (SSLServerSocket) factory.createServerSocket(port);
+        socket.setEnabledProtocols(new String[] { provider.getProtocol() });
+        socket.setNeedClientAuth(true);
+        return socket;
     }
 
-    public static SSLSocket createSSLSocket(String host, int port, SslContextProvider provider) throws Exception {
+    public static SSLSocket createSSLSocket(String host, int port, SslContextProvider provider) throws IOException, GeneralSecurityException {
         SSLContext context = createClientSSLContext(provider);
         SSLSocketFactory factory = context.getSocketFactory();
-        SSLSocket socket;
-        try {
-            socket = (SSLSocket) factory.createSocket(host, port);
-            socket.setEnabledProtocols(new String[] { provider.getProtocol() });
-            return socket;
-        } catch (IOException e) {
-            throw new Exception("Unable to create SSL socket", e);
-        }
+        SSLSocket socket = (SSLSocket) factory.createSocket(host, port);
+        socket.setEnabledProtocols(new String[] { provider.getProtocol() });
+        return socket;
     }
 
     public static TrustManager[] createTrustManagers(String keystore, char[] password) throws GeneralSecurityException, IOException {
