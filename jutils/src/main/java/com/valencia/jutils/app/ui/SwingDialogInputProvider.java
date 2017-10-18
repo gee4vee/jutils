@@ -22,6 +22,9 @@ public class SwingDialogInputProvider extends InputProvider {
     @Override
     public String getInput(String contextInfo, String message) throws Exception {
         String input = JOptionPane.showInputDialog(null, message, contextInfo, JOptionPane.QUESTION_MESSAGE);
+        if (input == null) {
+            return INPUT_CANCEL;
+        }
         return input;
     }
     
