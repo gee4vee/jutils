@@ -20,6 +20,7 @@ public abstract class InputProvider {
     public static final String[] VALID_TRUE_INPUT = new String[] {"true", "yes", "y"};
     
     public static final String INPUT_CANCEL = "cancel";
+    public static final String INPUT_YES = "yes";
 
     public InputProvider() {
     }
