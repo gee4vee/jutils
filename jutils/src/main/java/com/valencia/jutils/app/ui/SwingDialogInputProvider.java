@@ -19,13 +19,32 @@ public class SwingDialogInputProvider extends InputProvider {
         // TODO support parent component on input dialog
     }
     
-    /* (non-Javadoc)
-     * @see com.valencia.jutils.app.InputProvider#getInput(java.lang.String, java.lang.String)
-     */
     @Override
     public String getInput(String contextInfo, String message) throws Exception {
         String input = JOptionPane.showInputDialog(null, message, contextInfo, JOptionPane.QUESTION_MESSAGE);
         return input;
+    }
+    
+    @Override
+    public String getInput(String contextInfo) throws Exception {
+        return this.getInput(contextInfo, "");
+    }
+    
+    @Override
+    public boolean getBooleanInput(String contextInfo) throws Exception {
+        return this.getBooleanInput(contextInfo, "");
+    }
+    
+    @Override
+    public boolean getBooleanInput(String contextInfo, String message) throws Exception {
+        int input = JOptionPane.showConfirmDialog(null, message, contextInfo, JOptionPane.YES_NO_CANCEL_OPTION);
+        boolean result;
+        if (input == JOptionPane.NO_OPTION || input == JOptionPane.CANCEL_OPTION) {
+            result = false;
+        } else {
+            result = true;
+        }
+        return result;
     }
     
     public static void main(String[] args) throws Exception {
