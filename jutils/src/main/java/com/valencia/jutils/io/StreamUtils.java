@@ -4,8 +4,12 @@
 package com.valencia.jutils.io;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+
+import org.apache.commons.codec.digest.DigestUtils;
 
 /**
  * @author Gabriel Valencia, <gee4vee@me.com>
@@ -50,7 +54,14 @@ public class StreamUtils {
         }
 
         String lines = baos.toString(charsetName);
+        lines = lines.replace("\r", "");
         return lines;
+    }
+    
+    public static String checksum(File file) throws IOException {
+        try (FileInputStream fis = new FileInputStream(file)) {
+            return DigestUtils.md5Hex(fis);
+        }
     }
 
 }
