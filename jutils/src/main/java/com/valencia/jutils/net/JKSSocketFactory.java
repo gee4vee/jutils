@@ -4,6 +4,7 @@
 package com.valencia.jutils.net;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.security.GeneralSecurityException;
@@ -14,6 +15,8 @@ import javax.net.ssl.TrustManager;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import com.valencia.jutils.app.NumberConstants;
 
 /**
  * <p>A factory for producing sockets and server sockets including support for SSL with TLS v1.2. For SSL support, a trust store, server 
@@ -33,7 +36,7 @@ public class JKSSocketFactory implements SslContextProvider {
 	
 	public static final String PROTOCOL_TLS_12 = "TLSv1.2";
 	
-    public static final int DEFAULT_SOCKET_SO_TIMEOUT = 1000*60;
+    public static final int DEFAULT_SOCKET_CONNECT_TIMEOUT = (int) NumberConstants.MIN_MS;
 	
     protected boolean useSSL = true;
     protected final String truststoreName;
@@ -100,26 +103,47 @@ public class JKSSocketFactory implements SslContextProvider {
         return socket;
     }
 
+    /**
+     * Returns a socket connected to the specified host and port.
+     * 
+     * @param host The host name or IP address.
+     * @param port The port.
+     * 
+     * @throws IOException
+     * @throws GeneralSecurityException
+     */
     public Socket createSocket(String host, int port) throws IOException, GeneralSecurityException {
-        return this.createSocket(host, port, DEFAULT_SOCKET_SO_TIMEOUT);
+        return this.createSocket(host, port, DEFAULT_SOCKET_CONNECT_TIMEOUT);
     }
 	
+    /**
+     * Returns a socket connected to the specified host and port.
+     * 
+     * @param host The host name or IP address.
+     * @param port The port.
+     * @param timeout The amount of time to wait for the connection to succeed before timing out.
+     * 
+     * @throws IOException
+     * @throws GeneralSecurityException
+     */
 	public Socket createSocket(String host, int port, Integer timeout) throws IOException, GeneralSecurityException {
 		Socket socket;
 		if (this.useSSL) {
 	        if (logger.isTraceEnabled()) {
 	            logger.trace("Creating SSL socket for " + host + ":" + port);
 	        }
-            socket = SslUtils.createSSLSocket(host, port, this);
-            if (timeout != null) {
-                socket.setSoTimeout(timeout);
-            }
+            socket = SslUtils.createSSLSocket(host, port, timeout, this);
 			
 		} else {
             if (logger.isTraceEnabled()) {
                 logger.trace("Creating socket for " + host + ":" + port);
             }
-            socket = new Socket(host, port);
+            int to = DEFAULT_SOCKET_CONNECT_TIMEOUT;
+            if (timeout != null) {
+                to = timeout.intValue();
+            }
+            socket = new Socket();
+            socket.connect(new InetSocketAddress(host, port), to);
 		}
 
         if (logger.isTraceEnabled()) {

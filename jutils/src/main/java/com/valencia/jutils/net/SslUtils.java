@@ -6,6 +6,7 @@ package com.valencia.jutils.net;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
@@ -85,10 +86,15 @@ public class SslUtils {
         return socket;
     }
 
-    public static SSLSocket createSSLSocket(String host, int port, SslContextProvider provider) throws IOException, GeneralSecurityException {
+    public static SSLSocket createSSLSocket(String host, int port, Integer timeout, SslContextProvider provider) throws IOException, GeneralSecurityException {
         SSLContext context = createClientSSLContext(provider);
         SSLSocketFactory factory = context.getSocketFactory();
-        SSLSocket socket = (SSLSocket) factory.createSocket(host, port);
+        SSLSocket socket = (SSLSocket) factory.createSocket();
+        int to = 0;
+        if (timeout != null) {
+            to = timeout.intValue();
+        }
+        socket.connect(new InetSocketAddress(host, port), to);
         socket.setEnabledProtocols(new String[] { provider.getProtocol() });
         return socket;
     }
