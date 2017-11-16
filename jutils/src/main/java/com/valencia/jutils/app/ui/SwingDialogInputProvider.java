@@ -14,8 +14,11 @@ import com.valencia.jutils.app.InputProvider;
  * @author Gabriel Valencia, gee4vee@me.com
  */
 public class SwingDialogInputProvider extends InputProvider {
+    
+    public static final String ID = SwingDialogInputProvider.class.getSimpleName();
 
     public SwingDialogInputProvider() {
+        this.id = ID;
         // TODO support parent component on input dialog
     }
     

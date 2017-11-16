@@ -15,8 +15,11 @@ import com.valencia.jutils.app.InputProvider;
  * @author Gabriel Valencia, <gee4vee@me.com>
  */
 public class ConsoleInputProvider extends InputProvider {
+    
+    public static final String ID = ConsoleInputProvider.class.getSimpleName();
 
     public ConsoleInputProvider() {
+        this.id = ID;
     }
 
     @Override

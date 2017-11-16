@@ -21,8 +21,18 @@ public abstract class InputProvider {
     
     public static final String INPUT_CANCEL = "cancel";
     public static final String INPUT_YES = "yes";
-
+    
+    protected String id;
+    
     public InputProvider() {
+        this.id = InputProvider.class.getName();
+    }
+    
+    /**
+     * Returns the ID of this input provider. This should be unique across all providers in a single JVM.
+     */
+    public String getId() {
+        return this.id;
     }
     
     /**
