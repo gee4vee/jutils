@@ -3,6 +3,9 @@
  */
 package com.valencia.jutils.app.ui;
 
+import java.io.File;
+
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
@@ -51,6 +54,20 @@ public class SwingDialogInputProvider extends InputProvider {
             result = true;
         }
         return result;
+    }
+    
+    @Override
+    public File getFileInput(String contextInfo, String message) throws Exception {
+        JFileChooser chooser = new JFileChooser();
+        chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+        int result = chooser.showOpenDialog(null);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = chooser.getSelectedFile();
+            return selectedFile;
+            
+        } else {
+            return null;
+        }
     }
     
     public static void main(String[] args) throws Exception {

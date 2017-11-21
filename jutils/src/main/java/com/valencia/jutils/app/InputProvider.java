@@ -93,7 +93,8 @@ public abstract class InputProvider {
     }
     
     /**
-     * Returns the next input from the user as a <code>File</code>. This method may block until the user provides input.
+     * Returns the next input from the user as a <code>File</code>, or <code>null</code> if the user canceled input. This method 
+     * may block until the user provides input.
      * 
      * @param message A message to present to the user when requesting input.
      * 
@@ -101,6 +102,10 @@ public abstract class InputProvider {
      */
     public File getFileInput(String contextInfo, String message) throws Exception {
         String input = this.getInput(contextInfo, message);
+        if (INPUT_CANCEL.equals(input)) {
+            return null;
+        }
+        
         return new File(input);
     }
 
