@@ -5,6 +5,7 @@ package com.valencia.jutils.app.ui;
 
 import java.awt.Component;
 import java.io.File;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.swing.JFileChooser;
@@ -12,6 +13,7 @@ import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
 import com.valencia.jutils.app.InputProvider;
+import com.valencia.jutils.jvm.Platform;
 
 /**
  * An input provider that requests input from a Swing dialog box.
@@ -79,7 +81,8 @@ public class SwingDialogInputProvider extends InputProvider {
         JFileChooser chooser = new JFileChooser();
         chooser.setDialogTitle(message);
         String typeStr = null;
-        if (properties.containsKey(PROP_KEY_DIALOG_TYPE)) {
+        // there seems to be a bug on mac JDK 9 where the dialog doesnt show up if you explicitly set to open or save.
+        if (properties.containsKey(PROP_KEY_DIALOG_TYPE) && !Platform.get().equals(Platform.MAC_OS)) {
             typeStr = properties.get(PROP_KEY_DIALOG_TYPE).toString();
             if (PROP_VALUE_FILE_OPEN_DIALOG.equals(typeStr)) {
                 chooser.setDialogType(JFileChooser.OPEN_DIALOG);
@@ -138,8 +141,9 @@ public class SwingDialogInputProvider extends InputProvider {
         System.out.println("requesting string input...");
         System.out.println(ip.getInput("Test", "Please enter input:"));
 
+        Map<String, Object> properties = new LinkedHashMap<>();
         System.out.println("requesting file input...");
-        System.out.println(ip.getFileInput("Test", "Please choose a file"));
+        System.out.println(ip.getFileInput("Test", "Please choose a file", properties));
     }
 
 }
