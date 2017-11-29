@@ -59,8 +59,9 @@ public class SwingDialogInputProvider extends InputProvider {
     @Override
     public File getFileInput(String contextInfo, String message) throws Exception {
         JFileChooser chooser = new JFileChooser();
+        chooser.setDialogTitle(message);
         chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-        int result = chooser.showOpenDialog(null);
+        int result = chooser.showDialog(null, "Select");
         if (result == JFileChooser.APPROVE_OPTION) {
             File selectedFile = chooser.getSelectedFile();
             return selectedFile;
@@ -74,7 +75,11 @@ public class SwingDialogInputProvider extends InputProvider {
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         SwingDialogInputProvider ip = new SwingDialogInputProvider();
         
+        System.out.println("requesting string input...");
         System.out.println(ip.getInput("Test", "Please enter input:"));
+
+        System.out.println("requesting file input...");
+        System.out.println(ip.getFileInput("Test", "Please choose a file"));
     }
 
 }
